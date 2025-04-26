@@ -9,6 +9,7 @@ from .cryptic_utils import decrypt
 
 # Load from environment variables
 SIGNED_UNIQUE_REQ_ID = os.environ.get("SIGNED_UNIQUE_REQ_ID")
+print(SIGNED_UNIQUE_REQ_ID)
 ENCRYPTION_PRIVATE_KEY_BASE64 = os.environ.get("ENCRYPTION_PRIVATE_KEY")
 
 # ONDC's Staging Public Key (constant)
