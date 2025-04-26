@@ -5,6 +5,11 @@ import requests
 from datetime import datetime, timedelta
 from nacl.signing import SigningKey
 import os
+from nacl.bindings import crypto_sign_ed25519_sk_to_seed
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # --------------- CONFIGURATION ---------------
 # Load keys and details (replace these)
@@ -27,7 +32,9 @@ def generate_request_id():
     return str(uuid.uuid4())
 
 def generate_signature(message: str, private_key_base64: str):
-    signing_key = SigningKey(base64.b64decode(private_key_base64))
+    private_key_bytes = base64.b64decode(private_key_base64)
+    seed = crypto_sign_ed25519_sk_to_seed(private_key_bytes)
+    signing_key = SigningKey(seed)
     signed = signing_key.sign(message.encode('utf-8'))
     signature = base64.b64encode(signed.signature).decode('utf-8')
     return signature
@@ -70,7 +77,7 @@ payload = {
             "pan": {
                 "name_as_per_pan": "BANCWISE TECHNOLOGIES LLP",
                 "pan_no": "ABDFB1579P",
-                "date_of_incorporation": "2024-06-10"
+                "date_of_incorporation": "10/06/2024"
             },
             "name_of_authorised_signatory": "SIJO PAUL E",
             "address_of_authorised_signatory": "2/1384, Plot No 326, 15th Street, Harinagar, P O Punkunnam, Thrissur- 680002, Kerala, India",
@@ -79,7 +86,7 @@ payload = {
             "country": "IND",
             "subscriber_id": SUBSCRIBER_ID,
             "unique_key_id": UNIQUE_KEY_ID,
-            "callback_url": "/on_subscribe",
+            "callback_url": "/callback",
             "key_pair": {
                 "signing_public_key": SIGNING_PUBLIC_KEY,
                 "encryption_public_key": ENCRYPTION_PUBLIC_KEY,
@@ -89,8 +96,8 @@ payload = {
         },
         "network_participant": [
             {
-                "subscriber_url": "https://wc.flashfund.in",
-                "domain": "ONDC:FIS12",
+                "subscriber_url": "/",
+                "domain": "ONDC:FIS14",
                 "type": "buyerApp",
                 "msn": False,
                 "city_code": ["std:487"]
