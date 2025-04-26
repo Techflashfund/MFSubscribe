@@ -53,7 +53,7 @@ def create_authorization_header(body, subscriber_id, unique_key_id, private_key_
 
 # --------------- BUILD PAYLOAD ---------------
 
-request_id = "e5b3d64a-2b12-4c90-8f5f-96c4b10d4972"
+request_id = "3c697f83-4651-4a7f-84c8-018248c8c771"
 
 timestamp_now = get_timestamp()
 valid_from = timestamp_now
