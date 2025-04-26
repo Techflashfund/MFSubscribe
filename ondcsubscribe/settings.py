@@ -129,3 +129,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SECURE_CONTENT_TYPE_NOSNIFF = True
+
+APPEND_SLASH = False
