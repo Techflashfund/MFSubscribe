@@ -28,8 +28,8 @@ def get_timestamp():
 def get_valid_until():
     return (datetime.utcnow() + timedelta(days=365)).isoformat(timespec='milliseconds') + "Z"
 
-def generate_request_id():
-    return str(uuid.uuid4())
+# def generate_request_id():
+#     return str(uuid.uuid4())
 
 def generate_signature(message: str, private_key_base64: str):
     private_key_bytes = base64.b64decode(private_key_base64)
@@ -53,7 +53,8 @@ def create_authorization_header(body, subscriber_id, unique_key_id, private_key_
 
 # --------------- BUILD PAYLOAD ---------------
 
-request_id = generate_request_id()
+request_id = "e5b3d64a-2b12-4c90-8f5f-96c4b10d4972"
+
 timestamp_now = get_timestamp()
 valid_from = timestamp_now
 valid_until = get_valid_until()
@@ -86,7 +87,7 @@ payload = {
             "country": "IND",
             "subscriber_id": SUBSCRIBER_ID,
             "unique_key_id": UNIQUE_KEY_ID,
-            "callback_url": "/callback",
+            "callback_url":"/callback/on_subscribe",
             "key_pair": {
                 "signing_public_key": SIGNING_PUBLIC_KEY,
                 "encryption_public_key": ENCRYPTION_PUBLIC_KEY,
