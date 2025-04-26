@@ -19,7 +19,7 @@ def ondc_site_verification(request):
     return HttpResponse(f"""
     <html>
         <head>
-            <meta name='ondc-site-verification' content='{SIGNED_UNIQUE_REQ_ID}' />
+            <meta name='ondc-site-verification' content='qEz69g+jRM8UwCEXNrpz1nlBu5HRnSuImDWqZn4ZvjynKTTv5+yYHDfyXl9b5M9UjFc0kGlK26bd7fQBhGUkAg==' />
         </head>
         <body>
             ONDC Site Verification Page
