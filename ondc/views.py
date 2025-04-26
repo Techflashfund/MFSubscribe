@@ -4,7 +4,7 @@ import json
 import nacl.public
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from .cryptic_utils import decrypt_aes
+from .cryptic_utils import decrypt
 
 # Load from environment variables
 SIGNED_UNIQUE_REQ_ID = os.environ.get("SIGNED_REQ_ID")
@@ -43,7 +43,7 @@ def on_subscribe(request):
         shared_key = box.shared_key()
 
         # Decrypt challenge
-        decrypted_challenge = decrypt_aes(encrypted_challenge, shared_key)
+        decrypted_challenge = decrypt(encrypted_challenge, shared_key)
 
         return JsonResponse({"answer": decrypted_challenge})
 
