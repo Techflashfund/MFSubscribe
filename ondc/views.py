@@ -28,25 +28,52 @@ def ondc_site_verification(request):
     """, content_type="text/html")
 
 
+import os
+import json
+import base64
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import x25519
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+
+ONDC_PUBLIC_KEY_BASE64 = "MCowBQYDK2VuAyEAduMuZgmtpjdCuxv+Nc49K0cB6tL/Dj3HZetvVN7ZekM="
+
+def decrypt_challenge(encrypted_challenge, shared_key):
+    cipher = AES.new(shared_key, AES.MODE_ECB)
+    decrypted_bytes = cipher.decrypt(base64.b64decode(encrypted_challenge))
+    return unpad(decrypted_bytes, AES.block_size).decode('utf-8')
+
 @csrf_exempt
 def on_subscribe(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-        encrypted_challenge = data.get("challenge")
+        try:
+            data = json.loads(request.body)
+            encrypted_challenge = data.get("challenge")
 
-        # Load private key from env
-        private_key = nacl.public.PrivateKey(base64.b64decode(ENCRYPTION_PRIVATE_KEY_BASE64))
+            # Load encryption private key (correct way)
+            encryption_private_key_base64 = os.getenv("Encryption_Privatekey")
+            encryption_private_key_bytes = base64.b64decode(encryption_private_key_base64)
 
-        # Load ONDC's public key
-        peer_public_key = nacl.public.PublicKey(base64.b64decode(ONDC_PUBLIC_KEY_BASE64))
+            private_key = serialization.load_der_private_key(
+                encryption_private_key_bytes,
+                password=None
+            )
 
-        # Create shared key
-        box = nacl.public.Box(private_key, peer_public_key)
-        shared_key = box.shared_key()
+            # Load ONDC public key
+            ondc_public_key_bytes = base64.b64decode(ONDC_PUBLIC_KEY_BASE64)
+            public_key = serialization.load_der_public_key(ondc_public_key_bytes)
 
-        # Decrypt challenge
-        decrypted_challenge = decrypt(encrypted_challenge, shared_key)
+            # Generate shared key
+            shared_key = private_key.exchange(public_key)
 
-        return JsonResponse({"answer": decrypted_challenge})
+            # Decrypt the challenge
+            decrypted_challenge = decrypt_challenge(encrypted_challenge, shared_key)
+
+            return JsonResponse({"answer": decrypted_challenge})
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Invalid request"}, status=400)
